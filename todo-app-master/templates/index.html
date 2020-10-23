@@ -1,0 +1,119 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>To-Do</title>
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+	<link href="{% static 'css/style.css' %}" rel="stylesheet">
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="{% static 'js/scripts.js' %}"></script>
+</head>
+<body>
+<div class="wrapper">
+<div class="content">
+    {% if not username %}
+    <header>		
+		<div class="container login">
+			<form action="/login/" method="POST">{% csrf_token %}
+				<input type="text" name="login" placeholder = "Login" autocomplete="off">
+				<input type="password" name="pass" placeholder = "Password" autocomplete="off">
+				<input type="submit" value="Login">
+			</form>
+		</div>
+	</header>	
+	{% else %}
+	<header>
+		<div class="container login">
+			<form action="/logout/" method="POST">{% csrf_token %}
+				<span class="user">Hello, <b>{{username}}</b>!</span>
+				<input type="submit" value="Logout">
+			</form>
+		</div>
+	</header>
+
+	<section class="title">
+		<div class="container">
+			<h1>Simple todo lists</h1>
+			<h2>for ruby garage</h2>
+		</div>
+	</section>
+    
+    <div class="projects">
+	{% for tdlist in tdlists %}
+	<section class = "project project_id{{tdlist.id}}">
+		<div class="container">
+			<div class="project_title">
+				<img src="{% static 'img/project.png' %}" alt="project" class="logo">
+				<span class="title list_id{{tdlist.id}}">{{tdlist.name}}</span>
+				<ul class="tools">
+					<li class="date">
+	                	<input type="date" project_id="{{tdlist.id}}" value="{{tdlist.deadline|date:'Y-m-d'}}">
+                    </li>
+					<li class = "edt"><img src="{% static 'img/edit.png' %}" class="edit listedit" alt="edit" list_id = "{{tdlist.id}}"></li>
+					<li class = "trsh"><img src="{% static 'img/trash.png' %}" class="trash listdelete" list_id = "{{tdlist.id}}" alt="trash"></li>
+				</ul>
+			</div>
+
+			<div class="new_task clearfix">
+					<img src="{% static 'img/add.png' %}" class="add_img" alt="add">
+					
+					<input type="text" placeholder="Start typing to create a task..." id="type_task" name="tdlist{{tdlist.id}}">
+
+					<input type="button" value="Add Task" class = "add_task" list_id ="{{tdlist.id}}">
+				
+			</div> 
+			
+
+			<ul class="tasks tasks_list_id{{tdlist.id}}" id="ul{{tdlist.id}}">
+				{% for task in tdlist.task.all|dictsortreversed:"priority" %}
+				<li class="task task{{task.id}}">					
+    						<input type="checkbox" class = "done" name="done" task-id="{{ task.id }}" {% if task.done %} checked {% endif %}>
+                        
+                            <span class="task_id{{task.id}}">{{ task.name }}</span>
+                        
+						<ul class="tools">
+							<li class="date">
+                            	<input type="date" task_id="{{task.id}}" value="{{task.deadline|date:'Y-m-d'}}">
+                            </li>
+                            <div class="priority">
+                            <li class="up">
+                                <img src="{% static 'img/arrow.png' %}" class="priority prup" task_id="{{task.id}}" alt="up">
+                            </li>
+                            <li class="down">
+                                <img src="{% static 'img/arrow.png' %}" class="priority prdown" task_id="{{task.id}}" alt="down">
+                            </li>
+                            </div>
+							<li class="edt"><img src="{% static 'img/edit.png' %}" class="edit taskedit" task_id="{{task.id}}" alt="edit"></li>
+							<li class = "trsh"><img src="{% static 'img/trash.png' %}" class="trash taskdelete" task_id="{{task.id}}" alt="trash"></li>
+						</ul>
+				</li>
+				{% endfor %}				
+			</ul>
+		</div>
+	</section>
+	{% endfor %}
+    </div>
+	
+	
+
+	<section class="new_project">
+		<div class="container">				
+			<button type="submit" class = "add_list"><img src="{% static 'img/add.png' %}" class="add_img addlist" alt="add"><span class="addlist">Add TODO List</span></button>		
+		</div>
+	</section>
+
+
+</div>
+{% endif %}	
+
+	<footer>
+		<div class="container">			
+				<a href="https://github.com/CaptainJNS">
+				<img src="{% static 'img/git.png' %}" alt="git" height="20px">CaptainJNS</a>				
+		</div>			
+	</footer>
+</div>
+</body>
+</html>
